@@ -37,9 +37,10 @@
             </div>
             <DisclosurePanel class="md:hidden">
                 <div class="space-y-1 px-2 pt-2 pb-3">
-                    <DisclosureButton v-for="item in navigation" :key="item.name" as="a" :href="item.href"
-                        class= "flex flex-col items-start px-4 py-2 rounded-md font-bold text-gray-200 cursor-pointer hover:text-custom-cyan hover:bg-gray-700 duration-200">
-                        <span class="hover:scale-125 duration-200"> {{ item.name }}</span>
+                    <DisclosureButton> 
+                    <router-link class= "flex flex-col items-start px-4 py-2 rounded-md font-bold text-gray-200 cursor-pointer hover:text-custom-cyan hover:scale-125 duration-200"
+                     v-for="item in navigation" :key="item.name" :to="item.href">{{ item.name }}
+                    </router-link>
                     </DisclosureButton>
                 </div>
             </DisclosurePanel>
