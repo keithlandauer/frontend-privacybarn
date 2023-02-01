@@ -9,7 +9,7 @@
           mean. Add new services to get automatic annotations using natural language processing. Compare services to find what is right for you!
         </p>
         <p class="mx-auto my-2 text-sm text-custom-cyan italic">Designed by Keith Landauer</p>
-        <a href="https://github.com/kllandauer">
+        <a href="https://github.com/keithlandauer">
           <i class="mt-2 fa-brands fa-github h-10 w-10 text-custom-cyan hover:scale-150"></i>
         </a>
 

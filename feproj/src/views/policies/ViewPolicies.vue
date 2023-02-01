@@ -2,7 +2,7 @@
 <template>
     <div class="h-screen">
         <p class="text-4xl text-center font-bold my-5">Search or View Policies by Category</p>
-        <div class="flex flex-col items-center my-5">
+        <div v-if="!loading" class="flex flex-col items-center my-5">
             <input type="text" class="
         form-control
         shadow
@@ -30,7 +30,10 @@
                 </div>
             </div>
         </div>
-        <div
+        <div v-if="loading">
+        <div class="flex flex-col justify-center items-center mx-auto font-bold text-xl">LOADING....</div>
+        </div>
+        <div v-else
             class="flex flex-wrap justify-around items-center mx-6 mb-5 cursor-pointer border-1 border-gray-300 rounded shadow h-20 overflow-hidden">
             <div v-for="category in categories" :key="category.valueOf">
                 <div
@@ -59,45 +62,50 @@ import { ref, computed } from 'vue'
 import axios from 'axios'
 export default {
     setup() {
-        const policies = ref([])
+        const policies = ref([]) // main store of policies
         const categories = ref(['Social Media', 'Streaming', 'News', 'Shopping', 'Finance', 'Misc'])
-        const showPolicies = ref(false)
-        const featuredPolicy = ref('')
-        const search = ref('')
+        const showPolicies = ref(false) // flag for showing category policies
+        const featuredPolicy = ref('') // for category of policies being featured
+        const search = ref('') // for search function
+        const loading = ref(false) // flag to show loading when fetching 
 
         const fetchPolicies = async () => {
-            await axios
-                .get(`/api/policy/`)
-                .then((res) => {
-                    policies.value = res.data
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
+            try {
+                loading.value = true;
+                const res = await axios.get(`/api/policy/`);
+                policies.value = res.data;
+                loading.value = false;
+            } catch (error) {
+                console.error(error)
+            }
         }
-
+        /**
+         *  Filter policies based on category chosen by user 
+         */
         const filterPolicies = () => {
             let matchingPolicies = policies.value.filter(p => p.category == featuredPolicy.value)
             return matchingPolicies
         }
-
+         /**
+         * Set category based on user choice(event), toggle whether to show policies 
+         * @param *event
+         */
         const dropDownPolicies = (event) => {
-            if (showPolicies.value && event == featuredPolicy.value) {
+            if (showPolicies.value && (event == featuredPolicy.value)) {
                 showPolicies.value = !showPolicies.value
                 featuredPolicy.value = ''
-                console.log(featuredPolicy.value)
             }
             else if (showPolicies.value) {
                 featuredPolicy.value = event
-                console.log(featuredPolicy.value)
             }
             else {
                 showPolicies.value = !showPolicies.value
                 featuredPolicy.value = event
-                console.log(featuredPolicy.value)
             }
         }
-
+        /**
+         * Find matches of user search
+         */
         const filterSearch = computed(() => {
             return policies.value.filter((p) => {
                 return p.name.toLowerCase().match(search.value.toLowerCase())
@@ -106,7 +114,7 @@ export default {
 
         fetchPolicies()
 
-        return { filterPolicies, policies, categories, showPolicies, dropDownPolicies, featuredPolicy, filterSearch, search }
+        return { filterPolicies, policies, categories, showPolicies, dropDownPolicies, featuredPolicy, filterSearch, search, loading }
     }
 }
 
@@ -115,9 +123,4 @@ export default {
 div {
     color: black;
 }
-
-/* a:hover {
-    transition: color .3s ease-in-out, .3s ease-in-out;
-    color: #67E9FF;
-} */
 </style>
