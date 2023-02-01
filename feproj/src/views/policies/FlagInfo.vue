@@ -14,26 +14,24 @@
         </div>
     </div>
 </template>
-<script>
+<script setup>
 import { ref, watchEffect } from 'vue'
-export default {
-    props: {
-        transferFlags: {}
-    },
-
-    setup(props) {
-        const flag = ref([])
-
-        watchEffect(() => {
-            console.log('PROP:', props.transferFlags)
-            flag.value = props.transferFlags
-            console.log('FINAL', flag.value)
-        })
-        return { flag }
-    }
-
-}
-
+/**
+ * Prop for receiving flag to be displayed from singlePolicy.vue
+ */
+const props = defineProps({
+    transferFlags: {}
+})
+// filled via prop to display to local html
+const flag = ref([])
+/**
+ * Watch for prop to be populated
+ */
+watchEffect(() => {
+    console.log('PROP:', props.transferFlags)
+    flag.value = props.transferFlags
+    console.log('FINAL', flag.value)
+})
 </script>
 <style>
 .card-group {

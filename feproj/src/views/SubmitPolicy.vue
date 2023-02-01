@@ -84,7 +84,7 @@ export default {
                     router.push('/view-policies/' + slugged)
                 })
                 .catch((error) => {
-                    console.log(error)
+                    console.error(error)
                 })
                 .finally(() => {
                 })

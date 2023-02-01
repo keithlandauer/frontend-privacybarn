@@ -79,30 +79,29 @@ export default {
         const showInfo = ref(new Map())
 
         const fetchElements = async () => {
-            await axios
-                .get(`/api/elements/`)
-                .then((res) => {
-                    elements.value = res.data
-                    elements.value = elements.value.sort((a, b) => b.weight - a.weight)
-                })
-                .finally(() => {
-                    for (const e of elements.value) {
-                        showInfo.value.set(e.id, false)
-                    }
-                })
+            try {
+                const res = await axios.get(`/api/elements/`);
+                elements.value = res.data
+                elements.value = elements.value.sort((a, b) => b.weight - a.weight)
+                for (const e of elements.value) {
+                    showInfo.value.set(e.id, false)
+                }
+            } catch (error) {
+                console.error(error);
+            }
         }
+        /**
+         * Toggle more info on element based on instance chosen by user 
+         * @param *instance 
+         */
         const toggleInfo = (instance) => {
             showInfo.value.set(instance, !showInfo.value.get(instance))
             console.log(instance, showInfo.value.get(instance))
         }
         fetchElements()
         return { elements, showInfo, toggleInfo }
-
-
-
     }
 }
-
 </script>
 <style>
 

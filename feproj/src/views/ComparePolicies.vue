@@ -93,39 +93,38 @@ const flags = ref([])
 //map with true/false array
 const tablePolicies = ref([])
 const fetchInitial = async () => {
-    await axios
-        .get(`/api/elements/`)
-        .then((res) => {
-            elements.value = res.data
-            elements.value = elements.value.sort((a, b) => b.weight - a.weight)
-        })
-        .finally(() => {
-            axios
-                .get(`/api/policy/`)
-                .then((res) => {
-                    policies.value = res.data
-                    policies.value = policies.value.sort((a, b) => b.name - a.name)
-                })
-                .finally(() => {
-                    axios
-                        .get(`/api/element-flags/`)
-                        .then((res) => {
-                            flags.value = res.data
-                        })
-                })
-
-
-        })
+    try {
+        const res = await axios.get(`/api/elements/`);
+        elements.value = res.data;
+        //sort by good to bad 
+        elements.value = elements.value.sort((a, b) => b.weight - a.weight);
+    } catch (error) {
+        console.error("Element Error: ", error);
+    }
+    try {
+        const res0 = await axios.get(`/api/policy/`);
+        policies.value = res0.data
+        policies.value = policies.value.sort((a, b) => b.name - a.name)
+    } catch (error) {
+        console.error("Policy Error: ", error);
+    }
+    try {
+        const res1 = await axios.get(`/api/element-flags/`);
+        flags.value = res1.data;
+    } catch (error) {
+        console.error("Element Flag Error: ", error)
+    }
 }
+/**
+ * Get policy in column and determine if flag found for the element. 
+ * @param *element 
+ * @param *tablePolicy 
+ */
 const determinePresent = (element, tablePolicy) => {
     console.log("Element", element)
-    // console.log("Test", flags.value[0].element.id)
-    // console.log("tablePolicy", tablePolicy.id)
     let filteredFlags = flags.value.filter(f => f.policy == tablePolicy.id)
-    // console.log("Filtered Flags", filteredFlags.length,  filteredFlags[0].element)
-    // console.log("Filtered///", filteredFlags[0].element.id)
     console.log("TEST", filteredFlags[0].element.id)
-    for (var f of filteredFlags) {
+    for (const f of filteredFlags) {
         if (f.element.id == element.id) {
             return true
         }

@@ -71,51 +71,53 @@ export default {
         const route = useRoute();
         const policy = ref(null);
         const elementFlags = ref([]);
+        //object to fill current flag to be show and toggle showing
         const showInfo = ref({ show: false, flag: null });
 
         watchEffect(() => {
             console.log("showInfo:", showInfo.value["show"], "////", showInfo.value["flag"]);
         });
+        /**
+         * Fetch single policy and flags
+         */
         const fetchPolicy = async () => {
-            await axios
-                .get(`/api/policy/${route.params.slug}`)
-                .then((res) => {
-                    policy.value = res.data;
-                })
-                .catch((error) => {
-                    console.log("ERROR", error);
-                })
-                .finally(() => {
-                    fetchElementFlags()
-                });
+            try {
+                const res = await axios.get(`/api/policy/${route.params.slug}`)
+                policy.value = res.data;
+            } catch (error) {
+                console.error("Policy Error", error);
+            }
+            fetchElementFlags()
         };
+        /**
+         * Fetch flags, used in fatchPolicy()
+         */
         const fetchElementFlags = async () => {
-            await axios
-                .get(`/api/element-flags/`)
-                .then((res) => {
-                    elementFlags.value = res.data;
-                    elementFlags.value = elementFlags.value.filter(e => e.policy == policy.value.id);
-                    elementFlags.value = elementFlags.value.sort((a, b) => b.element.weight - a.element.weight)
-                })
-                .catch((error) => {
-                    console.log("ERROR", error);
-                })
-                .finally(() => {
-                    //nothing
-                });
+            try {
+                const res = await axios.get(`/api/element-flags/`)
+                elementFlags.value = res.data;
+                elementFlags.value = elementFlags.value.filter(e => e.policy == policy.value.id);
+                elementFlags.value = elementFlags.value.sort((a, b) => b.element.weight - a.element.weight)
+            } catch (error) {
+                console.error("Element Flag Error", error);
+            }
         };
+        /**
+         * Computed function to eliminate repeat flag when outputting table
+         */
         const createElementMap = computed(() => {
             const filteredFlags = new Map();
             for (const e of elementFlags.value) {
-                if (filteredFlags.has(e.element.id)) {
-                    continue;
-                }
-                else {
+                if (!filteredFlags.has(e.element.id)) {
                     filteredFlags.set(e.element.id, e.element);
                 }
             }
             return filteredFlags
         });
+        /**
+         *  Function to toggle show boolean and set flag to show 
+         * @param *flag 
+         */
         const setShowInfo = (flag) => {
             if (showInfo.value['show'] == true) {
                 let temp = elementFlags.value.filter(e => e.element.id == flag.id)
